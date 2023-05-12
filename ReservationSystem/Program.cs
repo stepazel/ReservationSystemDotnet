@@ -1,14 +1,25 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using ReservationSystem;
 using ReservationSystem.Data;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+// TODO setup logger
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.File("reservation_system.log")
+    .MinimumLevel.Debug()
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
@@ -48,6 +59,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 
 var app = builder.Build();
+app.UseMiddleware<ErrorHandlingMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

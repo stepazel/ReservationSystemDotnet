@@ -13,26 +13,43 @@ public class ReservationController : Controller
     {
         _dbContext = dbContext;
     }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public IActionResult Create([FromForm] CreateReservationModel model)
-    {
-        var reservationDo = new ReservationDo
-        {
-            Email = model.Email,
-            Date = model.Date,
-            Fee = model.Fee,
-            Location = model.Location
-        };
-        _dbContext.Reservations.Add(reservationDo);
-        _dbContext.SaveChanges();
-        return RedirectToAction("Index");
-    }
-
     [HttpGet]
     public IActionResult Index()
     {
-        return View();
+        var reservations = _dbContext.Reservations.ToList();
+        var model = new IndexModel {Reservations = reservations};
+        return View(model);
+    }
+
+    [HttpPost]
+    public IActionResult Test()
+    {
+        var reservations = new List<ReservationDo>();
+        for (var i = 0; i < 20; i++)
+        {
+            var reservation = new ReservationDo()
+            {
+                Date = DateTime.Today.AddDays(i),
+                Email = $"test{i}@email.com",
+                Fee = 500 * (i + 1),
+                Location = $"Test{i}"
+            };
+            reservations.Add(reservation);
+        }
+
+        _dbContext.Reservations.AddRange(reservations);
+        _dbContext.SaveChanges();
+        return Ok("Ahoj");
+    }
+
+    [HttpPost]
+    public IActionResult Delete(int id)
+    {
+        var reservation = _dbContext.Reservations.FirstOrDefault(reservationDo => reservationDo.Id == id);
+        if (reservation is null)
+            return NotFound($"A reservation with id {id} was not found");
+        _dbContext.Remove(reservation);
+        _dbContext.SaveChanges();
+        return Ok();
     }
 }
