@@ -1,0 +1,15 @@
+﻿@model ReservationSystem.Data.Entities.ReservationDo
+
+<td>@Model.Date</td>
+<td>@Model.Location</td>
+<td>@Model.Fee</td>
+<td>@Model.Email</td>
+<td>
+    <button class="btn @(Model.Approved is true ? "btn-success" : "btn-danger")"
+            hx-post="@Url.Action("Edit", "Reservation", new {id = Model.Id})"
+            hx-trigger="click"
+            hx-target="#row-@Model.Id"
+            hx-swap="innerHtml">
+        @(Model.Approved is true ? "Reject" : "Approve")
+    </button>
+</td>

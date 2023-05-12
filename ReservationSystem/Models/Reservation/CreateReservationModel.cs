@@ -10,7 +10,7 @@ public class CreateReservationModel
 
     [Required(ErrorMessage = "Please enter a date.")]
     [DataType(DataType.Date, ErrorMessage = "Please enter a valid date.")]
-    public DateTime Date { get; set; }
+    public DateTime DateTime { get; set; }
 
     [Required(ErrorMessage = "Please enter a value for location.")]
     public string Location { get; set; }

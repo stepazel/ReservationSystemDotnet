@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using ReservationSystem.Data;
 using ReservationSystem.Data.Entities;
@@ -24,11 +25,6 @@ public class HomeController : Controller
         return View();
     }
 
-    public IActionResult Privacy()
-    {
-        return View();
-    }
-
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
@@ -40,16 +36,23 @@ public class HomeController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult Create([FromForm] CreateReservationModel model)
     {
-        // TODO create a error handling(logging, flashmessaage) middleware
-        // TODO logger
+        if (IsDateInPast(model.DateTime))
+        {
+            TempData["ErrorMessage"] = $"Date {model.DateTime.Date} is in past.";
+            return RedirectToAction("Index");
+        }
 
-        if (IsDateInPast(model.Date))
-            throw new Exception($"Date {model.Date} is in past.");
+        if (_dbContext.Reservations.Any(reservationDo =>
+                reservationDo.Approved == true && reservationDo.Date == model.DateTime.Date))
+        {
+            TempData["ErrorMessage"] = "There is already an approved reservation on this date.";
+            return RedirectToAction("Index");
+        }
 
         var reservationDo = new ReservationDo
         {
             Email = model.Email,
-            Date = model.Date,
+            Date = model.DateTime,
             Fee = model.Fee,
             Location = model.Location
         };

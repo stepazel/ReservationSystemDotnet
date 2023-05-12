@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ReservationSystem.Data;
 using ReservationSystem.Data.Entities;
 using ReservationSystem.Models.Reservation;
 
 namespace ReservationSystem.Controllers;
 
+[Authorize]
 public class ReservationController : Controller
 {
     private readonly ApplicationDbContext _dbContext;
@@ -27,7 +29,7 @@ public class ReservationController : Controller
         var reservations = new List<ReservationDo>();
         for (var i = 0; i < 20; i++)
         {
-            var reservation = new ReservationDo()
+            var reservation = new ReservationDo
             {
                 Date = DateTime.Today.AddDays(i),
                 Email = $"test{i}@email.com",
@@ -43,13 +45,14 @@ public class ReservationController : Controller
     }
 
     [HttpPost]
-    public IActionResult Delete(int id)
+    public IActionResult Edit(int id)
     {
         var reservation = _dbContext.Reservations.FirstOrDefault(reservationDo => reservationDo.Id == id);
         if (reservation is null)
             return NotFound($"A reservation with id {id} was not found");
-        _dbContext.Remove(reservation);
+
+        reservation.Approved = reservation.Approved is not true;
         _dbContext.SaveChanges();
-        return Ok();
+        return PartialView("ReservationRow", reservation);
     }
 }

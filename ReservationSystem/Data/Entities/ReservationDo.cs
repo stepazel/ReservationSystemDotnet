@@ -7,4 +7,5 @@ public class ReservationDo
     public DateTime Date { get; set; }
     public string Location { get; set; } = null!;
     public decimal Fee { get; set; }
+    public bool? Approved { get; set; }
 }

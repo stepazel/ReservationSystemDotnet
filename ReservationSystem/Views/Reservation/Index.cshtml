@@ -17,19 +17,8 @@
     <tbody>
     @foreach (var reservation in Model.Reservations)
     {
-        <tr id="delete-@reservation.Id">
-            <td hx-post="/Reservation/Test" hx-trigger="click" hx-swap="outerHTML">@reservation.Date</td>
-            <td>@reservation.Location</td>
-            <td>@reservation.Fee</td>
-            <td>@reservation.Email</td>
-            <td>
-                <button class="btn btn-secondary"
-                        hx-post="/Reservation/Delete/@reservation.Id"
-                        hx-trigger="click"
-                        hx-target="#delete-@reservation.Id"
-                        hx-swap="delete" hx-confirm="Are you sure?"
-                        @* hx-delete="@Url.Action("Delete", "Reservation", new {id = reservation.Id})" *@>Delete</button>
-            </td>
+        <tr id="row-@reservation.Id">
+            @await Html.PartialAsync("ReservationRow", reservation)
         </tr>
     }
     </tbody>

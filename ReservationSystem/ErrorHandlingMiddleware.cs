@@ -21,9 +21,7 @@ public class ErrorHandlingMiddleware
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error has occurred");
-            // TODO return an Error.cshtml page!!
-            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-            await context.Response.WriteAsync("An error occurred. Please try again later.");
+            throw;
         }
     }
 
